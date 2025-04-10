@@ -28,7 +28,7 @@ const formatTime = (timestamp) => {
 
 <template>
   <div
-    class="w-[350px] border-r border-gray-700 bg-[#1B2730] p-4 flex flex-col"
+    class="w-[300px] md:w-[350px] border-r border-gray-700 bg-[#1B2730] p-4 flex flex-col h-screen md:h-auto"
   >
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-xl font-semibold">Message's (32)</h1>
@@ -50,7 +50,9 @@ const formatTime = (timestamp) => {
       </button>
     </div>
 
-    <div class="flex gap-3 mb-6 overflow-x-auto pb-2">
+    <div
+      class="flex gap-2 md:gap-3 mb-6 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent"
+    >
       <button
         v-for="filter in filters"
         :key="filter.id"

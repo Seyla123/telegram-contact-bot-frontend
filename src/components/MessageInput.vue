@@ -1,23 +1,100 @@
 <script setup>
 import { ref } from "vue";
+import "emoji-picker-element";
 
 const emit = defineEmits(["send"]);
 const newMessage = ref("");
+const isEmojiPickerVisible = ref(false);
+const isRecording = ref(false);
+const mediaRecorder = ref(null);
+const audioChunks = ref([]);
+const selectedFile = ref(null);
+const fileInputRef = ref(null);
 
 const sendMessage = () => {
   const message = newMessage.value.trim();
-  if (!message) return;
+  if (!message && !selectedFile.value) return;
 
-  emit("send", message);
+  if (selectedFile.value) {
+    emit("send", {
+      type: "file",
+      file: selectedFile.value,
+      name: selectedFile.value.name,
+    });
+    selectedFile.value = null;
+  } else {
+    emit("send", { type: "text", content: message });
+  }
   newMessage.value = "";
+};
+
+const toggleEmojiPicker = () => {
+  isEmojiPickerVisible.value = !isEmojiPickerVisible.value;
+};
+
+const onEmojiSelect = (event) => {
+  newMessage.value += event.detail.unicode;
+  isEmojiPickerVisible.value = false;
+};
+
+const handleFileSelect = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    selectedFile.value = file;
+  }
+};
+
+const startRecording = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder.value = new MediaRecorder(stream);
+    audioChunks.value = [];
+
+    mediaRecorder.value.ondataavailable = (event) => {
+      audioChunks.value.push(event.data);
+    };
+
+    mediaRecorder.value.onstop = () => {
+      const audioBlob = new Blob(audioChunks.value, { type: "audio/wav" });
+      emit("send", {
+        type: "audio",
+        file: audioBlob,
+        name: `Voice Message ${new Date().toLocaleTimeString()}`,
+      });
+    };
+
+    mediaRecorder.value.start();
+    isRecording.value = true;
+  } catch (error) {
+    console.error("Error accessing microphone:", error);
+  }
+};
+
+const stopRecording = () => {
+  if (mediaRecorder.value && isRecording.value) {
+    mediaRecorder.value.stop();
+    isRecording.value = false;
+    mediaRecorder.value.stream.getTracks().forEach((track) => track.stop());
+  }
 };
 </script>
 
 <template>
-  <div class="p-4 bg-[#1B2730] border-t border-gray-700">
-    <div class="flex items-center gap-3">
+  <div
+    class="fixed bottom-0 left-0 right-0 p-4 bg-[#1B2730] border-t border-gray-700 z-50"
+  >
+    <div class="relative flex items-center gap-3 max-w-screen-xl mx-auto">
+      <input
+        ref="fileInputRef"
+        type="file"
+        @change="handleFileSelect"
+        class="hidden"
+        accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
+      />
       <button
+        @click="() => fileInputRef.value.click()"
         class="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors"
+        title="Attach file"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +112,9 @@ const sendMessage = () => {
         </svg>
       </button>
       <button
+        @click="toggleEmojiPicker"
         class="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors"
+        title="Add emoji"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +139,10 @@ const sendMessage = () => {
         class="flex-1 bg-gray-700 text-white placeholder-gray-400 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <button
-        class="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors"
+        @click="isRecording ? stopRecording() : startRecording()"
+        class="p-2 hover:bg-gray-700 rounded-full transition-colors"
+        :class="isRecording ? 'text-red-500' : 'text-gray-400 hover:text-white'"
+        title="Record voice message"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -96,6 +178,46 @@ const sendMessage = () => {
           />
         </svg>
       </button>
+      <!-- Emoji Picker -->
+      <div v-if="isEmojiPickerVisible" class="absolute bottom-full left-0 mb-2">
+        <emoji-picker @emoji-click="onEmojiSelect"></emoji-picker>
+      </div>
+
+      <!-- Selected File Preview -->
+      <div
+        v-if="selectedFile"
+        class="absolute bottom-full left-0 mb-2 bg-gray-800 p-2 rounded-lg flex items-center gap-2"
+      >
+        <span class="text-sm text-gray-300">{{ selectedFile.name }}</span>
+        <button
+          @click="selectedFile = null"
+          class="text-gray-400 hover:text-white"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>
+
+<style>
+emoji-picker {
+  --background: #1f2937;
+  --border-color: #374151;
+  --category-emoji-padding: 0.5rem;
+  height: 300px;
+}
+</style>
