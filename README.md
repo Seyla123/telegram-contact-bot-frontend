@@ -14,6 +14,7 @@ A real-time communication platform built with Vue.js and Laravel that enables se
 ## Tech Stack
 
 Frontend:
+
 - Vue.js 3 - Progressive JavaScript framework
 - Telegram Bot API - For Telegram integration
 - Laravel Echo - For real-time communication
@@ -22,11 +23,6 @@ Frontend:
 - Vue Router - Navigation
 - Axios - HTTP client
 
-Backend:
-- Laravel - PHP framework
-- MySQL - Database
-- Redis - Caching & real-time features
-
 ## Getting Started
 
 ### Prerequisites
@@ -34,5 +30,5 @@ Backend:
 - Node.js (v16 or higher)
 - npm or yarn
 - Telegram Bot Token
-- Laravel backend API endpoint
+- backend API endpoint
 - Pusher account credentials
