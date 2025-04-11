@@ -1,17 +1,40 @@
 <script setup>
-defineProps({
+import { computed } from "vue";
+
+const props = defineProps({
   user: {
     type: Object,
     required: true,
     default: () => ({
-      name: "Unknown User",
-      status: "offline",
+      first_name: "",
+      last_name: "",
+      phone_number: "",
       avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=current",
     }),
   },
 });
 
 const emit = defineEmits(["back"]);
+
+const fullName = computed(() => {
+  const firstName = props.user.first_name || "";
+  const lastName = props.user.last_name || "";
+  return `${firstName} ${lastName}`.trim() || "Unknown User";
+});
+
+const formatPhoneNumber = (phoneNumber) => {
+  if (!phoneNumber) return "No phone number";
+  // Format: +855 95 501 717
+  const cleaned = phoneNumber.replace(/\D/g, "");
+  const match = cleaned.match(/^(\d{3})(\d{2})(\d{3})(\d{3})$/);
+  if (match) {
+    return `+${match[1]} ${match[2]} ${match[3]} ${match[4]}`;
+  }
+  return phoneNumber;
+};
+
+console.log('user : ',props.user);
+
 </script>
 
 <template>
@@ -34,10 +57,16 @@ const emit = defineEmits(["back"]);
         />
       </svg>
     </button>
-    <img :src="user.avatar" class="w-10 h-10 rounded-full" :alt="user.name" />
+    <img 
+      :src="user?.avatar || 'https://api.dicebear.com/6.x/avataaars/svg?seed=current'" 
+      class="w-10 h-10 rounded-full" 
+      :alt="fullName"
+    />
     <div class="flex-1">
-      <h2 class="font-medium">{{ user.name }}</h2>
-      <p class="text-sm text-gray-400">{{ user.status }}</p>
+      <h2 class="font-medium">{{ fullName }}</h2>
+      <p class="text-sm text-gray-400">
+        {{ formatPhoneNumber(user.phone_number) }}
+      </p>
     </div>
     <div class="flex items-center gap-3">
       <button class="p-2 hover:bg-gray-700 rounded-full">

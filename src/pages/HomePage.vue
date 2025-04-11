@@ -5,9 +5,7 @@ import {
   unsubscribeFromChannel,
 } from "@/services/pusherService.js";
 import ContactList from "@/components/ContactList.vue";
-import MessageList from "@/components/MessageList.vue";
-import ChatHeader from "@/components/ChatHeader.vue";
-import MessageInput from "@/components/MessageInput.vue";
+import ChatContainer from "@/components/ChatContainer.vue";
 import { useGetAllMessage } from "../services/messageApi";
 import { useGetAllContacts } from "../services/contactApi";
 
@@ -15,8 +13,12 @@ import { useGetAllContacts } from "../services/contactApi";
 const messages = ref([]);
 const currentUser = ref({
   id: "1214783920",
-  name: "Debra Nguyen",
-  status: "online",
+  first_name: "seav",
+  last_name: "seyla",
+  username: null,
+  phone_number: "85595501717",
+  created_at: "2025-04-09T06:16:27.000000Z",
+  updated_at: "2025-04-09T06:17:18.000000Z",
   avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=current",
 });
 
@@ -55,7 +57,7 @@ const messageQueryParams = computed(() => {
   if (!selectedContact.value) return undefined;
   return {
     page: 1,
-    limit: 5,
+    limit: 1,
     chat_id: selectedContact.value?.id,
   };
 });
@@ -86,7 +88,7 @@ watch(
       const newMessages = newData.data;
 
       console.log("New messages:", newMessages);
-      
+
       messages.value = [...newMessages];
     }
   },
@@ -95,8 +97,8 @@ watch(
 // Fetch once on mount
 onMounted(() => {
   subscribeToUserChannel(currentUser.value.id, (event) => {
-    console.log("New message received:", messages.value);
     messages.value.push(event.message);
+    console.log("New message received:", messages.value);
   });
 });
 onBeforeUnmount(() => {
@@ -141,34 +143,11 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <!-- Chat Area -->
-    <div
-      class="flex-1 flex flex-col bg-[#1B2730] relative overflow-hidden w-full"
-    >
-      <!-- Stars Background -->
-      <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIxIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMiIvPjwvc3ZnPg==')] opacity-50"
-        ></div>
-      </div>
-
-      <ChatHeader
-        :user="currentUser"
-        @back="toggleMobileMenu"
-        class="px-2 md:px-4"
-      />
-
-      <div class="flex-1 flex flex-col relative">
-        <MessageList
-          v-show="messages.length > 0"
-          :messages="messages"
-          class="flex-1 px-2 md:px-4 pb-[80px]"
-        />
-        <MessageInput
-          @send="handleSendMessage"
-          class="absolute bottom-0 left-0 right-0 px-2 md:px-4 pb-2 md:pb-4"
-        />
-      </div>
-    </div>
+    <ChatContainer
+      :selected-contact="selectedContact"
+      :messages="messages"
+      @send-message="handleSendMessage"
+      @toggle-mobile-menu="toggleMobileMenu"
+    />
   </div>
 </template>
