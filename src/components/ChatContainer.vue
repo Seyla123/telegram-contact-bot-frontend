@@ -46,7 +46,7 @@ const handleSendMessage = (message) => {
         />
         <MessageInput
           @send="handleSendMessage"
-          class="fixed md:sticky bottom-0 left-0 right-0 px-2 md:px-4 md:pb-4 bg-[#1B2730]"
+          class="sticky bottom-0 left-0 right-0 px-2 md:px-4 md:pb-4 bg-[#1B2730]"
         />
       </template>
       <WelcomeScreen v-else class="flex-1" />

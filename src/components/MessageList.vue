@@ -33,7 +33,7 @@ const formatTime = (timestamp) => {
         <!-- Message Content -->
         <div
           :class="[
-            'rounded-2xl px-3 py-2 w-fit',
+            'rounded-2xl px-3 py-2 w-fit relative',
             message.direction === 'in'
               ? 'bg-gray-700 text-white rounded-tl-none'
               : 'bg-blue-500 text-white rounded-tr-none',
@@ -97,6 +97,57 @@ const formatTime = (timestamp) => {
           :class="message.direction === 'in' ? 'text-left' : 'text-right'"
         >
           {{ formatTime(message.created_at) }}
+          <span v-if="message.direction === 'out'" class="ml-2">
+            <span v-if="message.status === 'sending'" class="text-gray-400">
+              <svg
+                class="w-4 h-4 inline"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </span>
+            <span v-else-if="message.status === 'sent'" class="text-blue-400">
+              <svg
+                class="w-4 h-4 inline"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </span>
+            <span
+              v-else-if="message.status === 'error'"
+              class="text-red-400 cursor-pointer"
+              title="Failed to send"
+            >
+              <svg
+                class="w-4 h-4 inline"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </span>
+          </span>
         </span>
       </div>
     </div>

@@ -50,7 +50,6 @@ const startRecording = async () => {
     mediaRecorder.value = new MediaRecorder(stream);
     audioChunks.value = [];
 
-
     mediaRecorder.value.ondataavailable = (event) => {
       audioChunks.value.push(event.data);
     };
@@ -82,9 +81,11 @@ const stopRecording = () => {
 
 <template>
   <div
-    class="w-full p-4 bg-[#1B2730] border-t border-gray-700 backdrop-blur-sm bg-opacity-95"
+    class="w-full p-4 bg-[#1B2730] border-t border-gray-700 backdrop-blur-sm z-100 bg-opacity-95"
   >
-    <div class="relative flex items-center gap-3 max-w-screen-xl mx-auto">
+    <div
+      class="relative flex items-center gap-1 sm:gap-3 max-w-screen-xl mx-auto flex-nowrap min-w-0 overflow-x-hidden"
+    >
       <input
         ref="fileInputRef"
         type="file"
@@ -94,12 +95,12 @@ const stopRecording = () => {
       />
       <button
         @click="() => fileInputRef.value.click()"
-        class="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors"
+        class="p-1.5 sm:p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors flex-shrink-0"
         title="Attach file"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
+          class="h-5 w-5 sm:h-6 sm:w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -114,12 +115,12 @@ const stopRecording = () => {
       </button>
       <button
         @click="toggleEmojiPicker"
-        class="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors"
+        class="p-1.5 sm:p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors flex-shrink-0"
         title="Add emoji"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
+          class="h-5 w-5 sm:h-6 sm:w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -137,48 +138,52 @@ const stopRecording = () => {
         type="text"
         placeholder="Type a message"
         @keyup.enter="sendMessage"
-        class="flex-1 bg-gray-700 text-white placeholder-gray-400 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="flex-1 min-w-0 bg-gray-700 text-white placeholder-gray-400 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-      <button
-        @click="isRecording ? stopRecording() : startRecording()"
-        class="p-2 hover:bg-gray-700 rounded-full transition-colors"
-        :class="isRecording ? 'text-red-500' : 'text-gray-400 hover:text-white'"
-        title="Record voice message"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      <div class="flex-shrink-0 flex items-center gap-1 sm:gap-2">
+        <button
+          @click="isRecording ? stopRecording() : startRecording()"
+          class="p-1.5 sm:p-2 hover:bg-gray-700 rounded-full transition-colors flex-shrink-0"
+          :class="
+            isRecording ? 'text-red-500' : 'text-gray-400 hover:text-white'
+          "
+          title="Record voice message"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-          />
-        </svg>
-      </button>
-      <button
-        @click="sendMessage"
-        class="p-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white transition-colors"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 sm:h-6 sm:w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+            />
+          </svg>
+        </button>
+        <button
+          @click="sendMessage"
+          class="p-1.5 sm:p-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white transition-colors flex-shrink-0"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 10l7-7m0 0l7 7m-7-7v18"
-          />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 sm:h-6 sm:w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 10l7-7m0 0l7 7m-7-7v18"
+            />
+          </svg>
+        </button>
+      </div>
       <!-- Emoji Picker -->
       <div v-if="isEmojiPickerVisible" class="absolute bottom-full left-0 mb-2">
         <emoji-picker @emoji-click="onEmojiSelect" class="light"></emoji-picker>

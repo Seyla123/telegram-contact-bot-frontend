@@ -27,16 +27,63 @@ const contacts = ref([]);
 
 // Chat state
 const selectedContact = ref(null);
+import { useSendMessage } from "../services/messageApi";
+
 // Message handling
-const handleSendMessage = (message) => {
+const { mutate: sendMessage, isLoading: isSending } = useSendMessage();
+
+const handleSendMessage = async (messageData) => {
+  if (!selectedContact.value) return;
+
   const newMessage = {
     id: Date.now(),
-    message,
+    chat_id: selectedContact.value.id,
+    message: messageData.type === "text" ? messageData.content : "",
     direction: "out",
-    message_type: "text",
+    message_type: messageData.type,
     created_at: new Date().toISOString(),
+    status: "sending",
   };
+
+  if (messageData.type !== "text") {
+    newMessage.file = messageData.file;
+    newMessage.file_name = messageData.name;
+  }
+
   messages.value.push(newMessage);
+
+  try {
+    const response = await sendMessage({
+      chat_id: selectedContact.value.id,
+      text: messageData.type === "text" ? messageData.content : "",
+      message_type: messageData.type,
+      file: messageData.file,
+    });
+
+    // Update message status on success
+    const messageIndex = messages.value.findIndex(
+      (msg) => msg.id === newMessage.id
+    );
+    if (messageIndex !== -1) {
+      messages.value[messageIndex] = {
+        ...messages.value[messageIndex],
+        status: "sent",
+        ...response,
+      };
+    }
+  } catch (error) {
+    // Update message status on error
+    const messageIndex = messages.value.findIndex(
+      (msg) => msg.id === newMessage.id
+    );
+    if (messageIndex !== -1) {
+      messages.value[messageIndex] = {
+        ...messages.value[messageIndex],
+        status: "error",
+      };
+    }
+    console.error("Failed to send message:", error);
+  }
 };
 
 // Mobile menu state
@@ -57,7 +104,7 @@ const messageQueryParams = computed(() => {
   if (!selectedContact.value) return undefined;
   return {
     page: 1,
-    limit: 20,
+    limit: 5,
     chat_id: selectedContact.value?.id,
   };
 });
