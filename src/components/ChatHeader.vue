@@ -33,8 +33,7 @@ const formatPhoneNumber = (phoneNumber) => {
   return phoneNumber;
 };
 
-console.log('user : ',props.user);
-
+console.log("user : ", props.user);
 </script>
 
 <template>
@@ -57,9 +56,12 @@ console.log('user : ',props.user);
         />
       </svg>
     </button>
-    <img 
-      :src="user?.avatar || 'https://api.dicebear.com/6.x/avataaars/svg?seed=current'" 
-      class="w-10 h-10 rounded-full" 
+    <img
+      :src="
+        user?.avatar ||
+        'https://api.dicebear.com/6.x/avataaars/svg?seed=current'
+      "
+      class="w-10 h-10 rounded-full"
       :alt="fullName"
     />
     <div class="flex-1">

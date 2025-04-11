@@ -24,9 +24,7 @@ const handleSendMessage = (message) => {
 </script>
 
 <template>
-  <div
-    class="flex-1 flex flex-col bg-[#1B2730] relative w-full h-screen overflow-hidden"
-  >
+  <div class="flex flex-col bg-[#1B2730] w-full">
     <!-- Stars Background -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div
@@ -34,24 +32,24 @@ const handleSendMessage = (message) => {
       ></div>
     </div>
 
-    <div class="flex-1 flex flex-col relative h-full">
+    <div class="flex flex-col h-full relative">
       <template v-if="selectedContact">
         <ChatHeader
           :user="selectedContact"
           @back="$emit('toggle-mobile-menu')"
-          class="px-2 md:px-4 sticky top-0 z-10 bg-[#1B2730]"
+          class="px-2 md:px-4 bg-[#1B2730] border-b border-gray-700 sticky top-0 z-10"
         />
         <MessageList
           v-show="messages.length > 0"
           :messages="messages"
-          class="flex-1 px-2 md:px-4 overflow-y-auto"
+          class="flex-1 overflow-y-auto min-h-0"
         />
         <MessageInput
           @send="handleSendMessage"
-          class="sticky bottom-0 left-0 right-0 px-2 md:px-4 pb-2 md:pb-4 bg-[#1B2730]"
+          class="fixed md:sticky bottom-0 left-0 right-0 px-2 md:px-4 md:pb-4 bg-[#1B2730]"
         />
       </template>
-      <WelcomeScreen v-else />
+      <WelcomeScreen v-else class="flex-1" />
     </div>
   </div>
 </template>

@@ -20,22 +20,20 @@ const formatTime = (timestamp) => {
 </script>
 
 <template>
-  <div
-    class="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth flex flex-col-reverse"
-  >
+  <div class="flex-1 p-2 overflow-y-auto scroll-smooth flex flex-col-reverse">
     <div
       v-for="message in [...messages].reverse()"
       :key="message?.id"
-      class="flex flex-col"
+      class="flex flex-col mb-1.5 last:mb-0"
     >
       <div
-        class="px-4 py-2 max-w-[85%] space-y-1"
+        class="px-2 py-1 w-fit max-w-[85%] space-y-1"
         :class="message.direction === 'in' ? '' : 'ml-auto'"
       >
         <!-- Message Content -->
         <div
           :class="[
-            'rounded-2xl px-4 py-2',
+            'rounded-2xl px-3 py-2 w-fit',
             message.direction === 'in'
               ? 'bg-gray-700 text-white rounded-tl-none'
               : 'bg-blue-500 text-white rounded-tr-none',

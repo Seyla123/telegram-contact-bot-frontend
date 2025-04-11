@@ -57,7 +57,7 @@ const messageQueryParams = computed(() => {
   if (!selectedContact.value) return undefined;
   return {
     page: 1,
-    limit: 1,
+    limit: 20,
     chat_id: selectedContact.value?.id,
   };
 });
@@ -107,10 +107,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex bg-[#1B2730] text-white relative">
+  <div class="max-h-screen h-screen flex bg-[#1B2730] text-white relative">
     <!-- Mobile menu button -->
     <button
-      class="md:hidden absolute top-4 left-4 z-50 p-2 bg-gray-700 rounded-full"
+      class="md:hidden fixed top-4 left-4 z-50 p-2 bg-gray-700 rounded-full"
       @click="toggleMobileMenu"
     >
       <svg
@@ -132,7 +132,7 @@ onBeforeUnmount(() => {
     <!-- Contact list with mobile responsive behavior -->
     <div
       :class="[
-        'md:relative md:translate-x-0 absolute inset-y-0 left-0 transform',
+        'md:relative md:translate-x-0 absolute  bg-[#1B2730]  inset-y-0 left-0 transform',
         'transition-transform duration-300 ease-in-out z-40',
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
       ]"
