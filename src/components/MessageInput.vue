@@ -33,7 +33,7 @@ const toggleEmojiPicker = () => {
 };
 
 const onEmojiSelect = (event) => {
-  newMessage.value += event.detail.unicode;
+  newMessage.value += event.detail.emoji.unicode;
   isEmojiPickerVisible.value = false;
 };
 
@@ -49,6 +49,7 @@ const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder.value = new MediaRecorder(stream);
     audioChunks.value = [];
+
 
     mediaRecorder.value.ondataavailable = (event) => {
       audioChunks.value.push(event.data);
@@ -81,7 +82,7 @@ const stopRecording = () => {
 
 <template>
   <div
-    class="fixed bottom-0 left-0 right-0 p-4 bg-[#1B2730] border-t border-gray-700 z-50"
+    class="w-full p-4 bg-[#1B2730] border-t border-gray-700 backdrop-blur-sm bg-opacity-95"
   >
     <div class="relative flex items-center gap-3 max-w-screen-xl mx-auto">
       <input
@@ -180,7 +181,7 @@ const stopRecording = () => {
       </button>
       <!-- Emoji Picker -->
       <div v-if="isEmojiPickerVisible" class="absolute bottom-full left-0 mb-2">
-        <emoji-picker @emoji-click="onEmojiSelect"></emoji-picker>
+        <emoji-picker @emoji-click="onEmojiSelect" class="light"></emoji-picker>
       </div>
 
       <!-- Selected File Preview -->

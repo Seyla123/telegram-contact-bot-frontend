@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import {
   subscribeToUserChannel,
   unsubscribeFromChannel,
@@ -8,6 +8,7 @@ import ContactList from "@/components/ContactList.vue";
 import MessageList from "@/components/MessageList.vue";
 import ChatHeader from "@/components/ChatHeader.vue";
 import MessageInput from "@/components/MessageInput.vue";
+import { useGetAllMessage } from "../services/messageApi";
 
 // State management
 const messages = ref([]);
@@ -54,14 +55,34 @@ const handleContactSelect = (contact) => {
     isMobileMenuOpen.value = false;
   }
 };
+const params = {
+  page: 1,
+  limit: 10,
+};
+const {
+  data: messagesData,
+  isLoading,
+  isError,
+  error,
+  isFetched,
+} = useGetAllMessage(params);
 
+watch(
+  () => messagesData?.value,
+  (newData) => {
+    if (newData?.data) {
+      messages.value = [...newData.data] ;
+    }
+  },
+  { immediate: true }
+);
+// Fetch once on mount
 onMounted(() => {
   subscribeToUserChannel(currentUser.value.id, (event) => {
-    console.log("New message received:", event.message);
+    console.log("New message received:", messages.value);
     messages.value.push(event.message);
   });
 });
-
 onBeforeUnmount(() => {
   unsubscribeFromChannel(currentUser.value.id);
 });
@@ -118,12 +139,17 @@ onBeforeUnmount(() => {
         class="px-2 md:px-4"
       />
 
-      <MessageList :messages="messages" class="px-2 md:px-4" />
-
-      <MessageInput
-        @send="handleSendMessage"
-        class="px-2 md:px-4 pb-2 md:pb-4"
-      />
+      <div class="flex-1 flex flex-col relative">
+        <MessageList
+          v-show="messages.length > 0"
+          :messages="messages"
+          class="flex-1 px-2 md:px-4 pb-[80px]"
+        />
+        <MessageInput
+          @send="handleSendMessage"
+          class="absolute bottom-0 left-0 right-0 px-2 md:px-4 pb-2 md:pb-4"
+        />
+      </div>
     </div>
   </div>
 </template>

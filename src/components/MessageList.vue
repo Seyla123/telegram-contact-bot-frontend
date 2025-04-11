@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
+import VoiceMessage from "./VoiceMessage.vue";
 
 const props = defineProps({
   messages: {
@@ -69,7 +70,7 @@ const formatTime = (timestamp) => {
   >
     <div
       v-for="(message, index) in messages"
-      :key="message.id"
+      :key="message?.id"
       :ref="index === messages.length - 1 ? lastMessageRef : undefined"
       class="flex flex-col"
     >
@@ -93,8 +94,19 @@ const formatTime = (timestamp) => {
 
           <!-- Media Message -->
           <div v-else-if="message.file_path" class="space-y-2">
+            <!-- Voice Message -->
             <div
-              v-if="
+              v-if="message.message_type === 'voice'"
+              class="rounded-lg overflow-hidden"
+            >
+              <VoiceMessage
+                :file_path="message.file_path"
+                :duration="message.duration"
+              />
+            </div>
+            <!-- Photo Message -->
+            <div
+              v-else-if="
                 message.message_type === 'photo' ||
                 message.mime_type?.startsWith('image')
               "
