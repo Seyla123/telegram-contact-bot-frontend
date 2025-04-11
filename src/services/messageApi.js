@@ -1,5 +1,6 @@
 import { baseApi } from "@/services/baseApi";
 import { useQuery } from "@tanstack/vue-query";
+import { computed, unref } from "vue";
 
 const getAllMessages = async (params) => {
   const { data } = await baseApi.get("/telegram/message", { params });
@@ -9,9 +10,16 @@ const getAllMessages = async (params) => {
 
   return message;
 };
-export const useGetAllMessage = (params = {}) =>
-  useQuery({
-    queryKey: ["messages", params],
-    queryFn: () => getAllMessages(params),
+export const useGetAllMessage = (paramsRef) => {
+  const resolvedParams = computed(() => unref(paramsRef));
+
+  return useQuery({
+    queryKey: computed(() => ["messages", resolvedParams.value?.chat_id]),
+    queryFn: () => {
+      if (!resolvedParams.value?.chat_id) return Promise.resolve(null);
+      return getAllMessages(resolvedParams.value);
+    },
+    enabled: computed(() => !!resolvedParams.value?.chat_id), // ✅ reactive enabled
     staleTime: 60000,
   });
+};

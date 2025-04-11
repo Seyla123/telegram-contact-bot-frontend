@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch, computed } from "vue";
 import {
   subscribeToUserChannel,
   unsubscribeFromChannel,
@@ -9,6 +9,7 @@ import MessageList from "@/components/MessageList.vue";
 import ChatHeader from "@/components/ChatHeader.vue";
 import MessageInput from "@/components/MessageInput.vue";
 import { useGetAllMessage } from "../services/messageApi";
+import { useGetAllContacts } from "../services/contactApi";
 
 // State management
 const messages = ref([]);
@@ -20,16 +21,10 @@ const currentUser = ref({
 });
 
 // Mock contacts data
-const contacts = ref(
-  Array.from({ length: 8 }, (_, i) => ({
-    id: i + 1,
-    name: `User ${i + 1}`,
-    lastMessage: "Last message preview...",
-    timestamp: new Date(),
-    avatar: `https://api.dicebear.com/6.x/avataaars/svg?seed=${i}`,
-  }))
-);
+const contacts = ref([]);
 
+// Chat state
+const selectedContact = ref(null);
 // Message handling
 const handleSendMessage = (message) => {
   const newMessage = {
@@ -51,27 +46,48 @@ const toggleMobileMenu = () => {
 
 const handleContactSelect = (contact) => {
   console.log("Selected contact:", contact);
+  selectedContact.value = contact;
   if (window.innerWidth < 768) {
     isMobileMenuOpen.value = false;
   }
 };
-const params = {
-  page: 1,
-  limit: 10,
-};
+const messageQueryParams = computed(() => {
+  if (!selectedContact.value) return undefined;
+  return {
+    page: 1,
+    limit: 5,
+    chat_id: selectedContact.value?.id,
+  };
+});
+
 const {
   data: messagesData,
   isLoading,
   isError,
   error,
   isFetched,
-} = useGetAllMessage(params);
+} = useGetAllMessage(messageQueryParams);
+const { data: contactsData } = useGetAllContacts();
+
+watch(
+  () => contactsData?.value,
+  (newData) => {
+    if (newData?.data) {
+      contacts.value = [...newData.data];
+    }
+  },
+  { immediate: true }
+);
 
 watch(
   () => messagesData?.value,
   (newData) => {
     if (newData?.data) {
-      messages.value = [...newData.data] ;
+      const newMessages = newData.data;
+
+      console.log("New messages:", newMessages);
+      
+      messages.value = [...newMessages];
     }
   },
   { immediate: true }
@@ -119,7 +135,10 @@ onBeforeUnmount(() => {
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
       ]"
     >
-      <ContactList :contacts="contacts" @select-contact="handleContactSelect" />
+      <ContactList
+        :contacts="contactsData"
+        @select-contact="handleContactSelect"
+      />
     </div>
 
     <!-- Chat Area -->

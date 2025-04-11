@@ -24,6 +24,20 @@ const formatTime = (timestamp) => {
     minute: "2-digit",
   });
 };
+
+const getFullName = (contact) => {
+  const firstName = contact.first_name || "";
+  const lastName = contact.last_name || "";
+  return `${firstName} ${lastName}`.trim() || "Unknown";
+};
+
+const formatPhoneNumber = (phoneNumber) => {
+  return phoneNumber || "No phone number";
+};
+
+const getAvatarUrl = (contact) => {
+  return `https://api.dicebear.com/6.x/avataaars/svg?seed=${contact.id}`;
+};
 </script>
 
 <template>
@@ -68,22 +82,26 @@ const formatTime = (timestamp) => {
 
     <div class="flex-1 overflow-y-auto space-y-4">
       <div
-        v-for="i in 8"
-        :key="i"
-        @click="emit('select-contact', i)"
-        class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl cursor-pointer transition-colors"
+        v-for="contact in contacts"
+        :key="contact.id"
+        @click="emit('select-contact', contact)"
+        class="flex items-center gap-3 p-2 hover:bg-gray-700 rounded-lg cursor-pointer transition-colors duration-200"
       >
         <img
-          :src="`https://api.dicebear.com/6.x/avataaars/svg?seed=${i}`"
-          class="w-12 h-12 rounded-full"
-          :alt="`Contact ${i}`"
+          :src="getAvatarUrl(contact)"
+          :alt="getFullName(contact)"
+          class="w-12 h-12 rounded-full object-cover"
         />
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
-            <h3 class="font-medium truncate">User Name</h3>
-            <span class="text-xs text-gray-400">12:34 PM</span>
+            <h3 class="font-medium truncate">{{ getFullName(contact) }}</h3>
+            <span class="text-xs text-gray-400">{{
+              formatTime(contact.created_at)
+            }}</span>
           </div>
-          <p class="text-sm text-gray-400 truncate">Last message preview...</p>
+          <p class="text-sm text-gray-400 truncate">
+            {{ formatPhoneNumber(contact.phone_number) }}
+          </p>
         </div>
       </div>
     </div>

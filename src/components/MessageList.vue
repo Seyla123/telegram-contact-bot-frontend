@@ -10,50 +10,6 @@ const props = defineProps({
   },
 });
 
-const messagesContainer = ref(null);
-const observer = ref(null);
-const lastMessageRef = ref(null);
-
-// Improved scroll behavior with smooth animation
-const scrollToBottom = (smooth = true) => {
-  if (messagesContainer.value) {
-    messagesContainer.value.scrollTo({
-      top: messagesContainer.value.scrollHeight,
-      behavior: smooth ? "smooth" : "auto",
-    });
-  }
-};
-
-// Watch for new messages and scroll to bottom
-watch(
-  () => props.messages.length,
-  (newLength, oldLength) => {
-    if (newLength > oldLength) {
-      scrollToBottom();
-    }
-  }
-);
-
-onMounted(() => {
-  // Initial scroll without smooth animation
-  scrollToBottom(false);
-
-  // Set up intersection observer for scroll behavior
-  observer.value = new IntersectionObserver(
-    (entries) => {
-      const lastEntry = entries[0];
-      if (lastEntry.isIntersecting) {
-        scrollToBottom();
-      }
-    },
-    { threshold: 0.5 }
-  );
-
-  if (lastMessageRef.value) {
-    observer.value.observe(lastMessageRef.value);
-  }
-});
-
 // Format timestamp
 const formatTime = (timestamp) => {
   return new Date(timestamp).toLocaleTimeString([], {
@@ -65,13 +21,11 @@ const formatTime = (timestamp) => {
 
 <template>
   <div
-    ref="messagesContainer"
-    class="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth"
+    class="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth flex flex-col-reverse"
   >
     <div
-      v-for="(message, index) in messages"
+      v-for="message in [...messages].reverse()"
       :key="message?.id"
-      :ref="index === messages.length - 1 ? lastMessageRef : undefined"
       class="flex flex-col"
     >
       <div
